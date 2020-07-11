@@ -1,0 +1,12 @@
+version: '2'
+services:
+  web:
+    build:
+      context: .
+    volumes:
+    - .:/var/www/html
+    ports:
+    - 1234:80
+
+  redis:
+    image: redis:latest

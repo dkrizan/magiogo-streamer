@@ -1,0 +1,17 @@
+redis:
+  host: redis
+  port: 6379
+
+# Magio.tv API urls
+api:
+  auth: https://skgo.magio.tv/v2/auth/init
+  login: https://skgo.magio.tv/v2/auth/login
+  stream: https://skgo.magio.tv/v2/television/stream-url
+
+# access token expiration in seconds
+accessTokenExpiration: 1800
+
+# credentials to Magio.tv API
+auth:
+  username:
+  password:
