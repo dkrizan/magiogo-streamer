@@ -17,8 +17,13 @@ class Channels {
         'jednotka' => 4099,
         'markiza' => 4044,
         'joj' => 4070,
+        "doma" => 4221,
+        "dajto" => 4111,
         'ct1' => 4240,
-        'ct2' => 4239
+        'ct2' => 4239,
+        'ct24' => 4074,
+        'ctsport' => 4464,
+        'sport2' => 4143
     ];
 
     /**
