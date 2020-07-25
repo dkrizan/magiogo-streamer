@@ -35,7 +35,7 @@ class Cache extends RedisAdapter {
     /**
      * Fetch data from cache
      * @param string $key
-     * @return CacheItem
+     * @return mixed
      * @throws InvalidArgumentException
      */
     public function fetch(string $key) {

@@ -50,12 +50,24 @@ $container->set('authorization', function ($c) {
     $guzzle = $c->get('guzzle');
     return new \App\Authorization($connection, $config, $guzzle);
 });
+$container->set('loggerFactory', function ($c) {
+    $settings =  [
+        'name' => 'app',
+        'path' => __DIR__ . '/../log',
+        'filename' => 'app.log',
+        'level' => \Monolog\Logger::DEBUG,
+        'file_permission' => 0775
+    ];
+    return new \Libs\LoggerFactory($settings);
+});
 
 // Set the base path to run the app in a subdirectory.
 // This path is used in urlFor().
 $app->add(new BasePathMiddleware($app));
 
-$app->addErrorMiddleware(true, true, true);
+$loggerFactory = $app->getContainer()->get('loggerFactory');
+$logger = $loggerFactory->addFileHandler('error.log')->createInstance('error');
+$app->addErrorMiddleware($container->get('config')->get('debug', false), true, true, $logger);
 
 // Define app routes
 $app->get('/', function (Request $request, Response $response) {

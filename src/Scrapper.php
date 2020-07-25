@@ -47,11 +47,12 @@ class Scrapper {
     /**
      * Fetch channel's stream url
      * @param String $channel
+     * @return string
      * @throws UnknownChannelNameException
      * @throws \Psr\Cache\InvalidArgumentException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function fetchStreamUrl(String $channel) {
+    public function fetchStreamUrl(String $channel) : string {
         $stream = $this->cache->fetch($channel);
         if ($stream == null) {
             $accessToken = $this->authorization->getToken();
