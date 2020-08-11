@@ -15,15 +15,19 @@ class Channels {
      */
     public static $channels = [
         'jednotka' => 4099,
+        'dvojka' => 4146,
         'markiza' => 4044,
         'joj' => 4070,
-        "doma" => 4221,
-        "dajto" => 4111,
+        'jojplus' => 4222,
+        'doma' => 4221,
+        'wau' => 4223,
+        'dajto' => 4111,
         'ct1' => 4240,
         'ct2' => 4239,
         'ct24' => 4074,
         'ctsport' => 4464,
-        'sport2' => 4143
+        'sport2' => 4143,
+        'amc' => 4324
     ];
 
     /**
