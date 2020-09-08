@@ -56,6 +56,11 @@ class Scrapper {
         $stream = $this->cache->fetch($channel);
         if ($stream == null) {
             $accessToken = $this->authorization->getToken();
+            try {
+                $channelId = Channels::getChannelId($channel);
+            } catch (UnknownChannelNameException $e) {
+                die ($e->getMessage());
+            }
             $res = $this->client->get($this->config->get('api.stream'), [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $accessToken,
@@ -65,7 +70,7 @@ class Scrapper {
                     'service' => "LIVE",
                     'name' => "Web Browser",
                     'devtype' => "OTT_WIN",
-                    'id' => Channels::getChannelId($channel),
+                    'id' => $channelId,
                     'prof' => "p0",
                     'drm' => "verimatrix"
                 ]
