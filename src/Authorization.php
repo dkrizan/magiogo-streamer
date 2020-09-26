@@ -47,7 +47,7 @@ class Authorization {
      * @throws InvalidArgumentException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getToken() {
+    private function getToken() {
         if ($this->token == null) {
             $this->token = $this->getTokenFromCache();
             if ($this->token == null) {
@@ -55,6 +55,19 @@ class Authorization {
             }
         }
         return $this->token;
+    }
+
+    /**
+     * Return authorization headers
+     * @return \string[]
+     * @throws InvalidArgumentException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getHeaders() {
+        return [
+            'Authorization' => 'Bearer ' . $this->getToken(),
+            'Content-Type' => 'application/json'
+        ];
     }
 
     /**

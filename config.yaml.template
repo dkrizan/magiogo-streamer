@@ -8,6 +8,7 @@ api:
   auth: https://skgo.magio.tv/v2/auth/init
   login: https://skgo.magio.tv/v2/auth/login
   stream: https://skgo.magio.tv/v2/television/stream-url
+  channels: https://skgo.magio.tv/v2/television/channels
 
 # access token expiration in seconds
 accessTokenExpiration: 1800

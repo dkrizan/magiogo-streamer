@@ -7,40 +7,92 @@
 
 namespace App;
 
+use Libs\Cache;
+use Noodlehaus\Config;
+use Predis\Client;
+
 class Channels {
 
+    /** @var Cache */
+    private $cache;
+
+    /** @var \GuzzleHttp\Client */
+    private $client;
+
+    /** @var Authorization */
+    private $authorization;
+
+    /** @var Config */
+    private $config;
+
+    /** @var array */
+    protected $channels = [];
+
     /**
-     * Array of channels and theirs ids
-     * @var int[]
+     * Channels constructor.
+     * @param Client $connection
+     * @param \GuzzleHttp\Client $client
+     * @param Authorization $authorization
+     * @param Config $config
      */
-    public static $channels = [
-        'jednotka' => 4099,
-        'dvojka' => 4146,
-        'markiza' => 4044,
-        'joj' => 4070,
-        'jojplus' => 4222,
-        'doma' => 4221,
-        'wau' => 4223,
-        'dajto' => 4111,
-        'ct1' => 4240,
-        'ct2' => 4239,
-        'ct24' => 4074,
-        'ctsport' => 4464,
-        'sport2' => 4143,
-        'amc' => 4324
-    ];
+    public function __construct(
+        Client $connection,
+        \GuzzleHttp\Client $client,
+        Authorization $authorization,
+        Config $config
+    ) {
+        $this->cache = new Cache($connection, 'channels');
+        $this->client = $client;
+        $this->authorization = $authorization;
+        $this->config = $config;
+    }
 
     /**
      * Returns channel ID
-     * @param String $name
-     * @return int
-     * @throws UnknownChannelNameException
+     * @param int $id
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public static function getChannelId(String $name) {
-        if (!isset(self::$channels[$name])) {
-            $channels = join(', ',array_keys(self::$channels));
-            throw new UnknownChannelNameException("Given channel name is not found. Available channels are: $channels");
+    public function isValid(int $id) {
+        return isset($this->getChannels()[$id]);
+    }
+
+    /**
+     * Returns list of channels
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @return array
+     */
+    public function loadChannels() {
+        if (($channels = $this->cache->fetch('channels')) == NULL) {
+            $response = $this->client->get($this->config->get('api.channels'), [
+                'headers' => $this->authorization->getHeaders(),
+                'query' => [
+                    'list' => 'LIVE',
+                    'queryScope' => 'LIVE'
+                ]
+            ]);
+            $data = json_decode($response->getBody()->getContents(), true);
+            $channels = [];
+            foreach ($data['items'] as $item) {
+                $channel = $item['channel'];
+                $channels[$channel['channelId']] = $channel['name'];
+            }
+            $this->cache->store('channels', $channels);
         }
-        return self::$channels[$name];
+        return $channels;
+    }
+
+    /**
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function getChannels(): array {
+        if (!$this->channels) {
+            $this->channels = $this->loadChannels();
+        }
+        return $this->channels;
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\UnknownChannelNameException;
 use DI\Container;
 use Predis\Client;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -40,9 +41,10 @@ $container->set('guzzle', function () {
 $container->set('scrapper', function ($c) {
     $connection = $c->get('redis');
     $authorization = $c->get('authorization');
+    $channels = $c->get('channels');
     $guzzle = $c->get('guzzle');
     $config = $c->get('config');
-    return new \App\Scrapper($connection, $authorization, $guzzle, $config);
+    return new \App\Scrapper($connection, $authorization, $channels, $guzzle, $config);
 });
 $container->set('authorization', function ($c) {
     $connection = $c->get('redis');
@@ -50,6 +52,14 @@ $container->set('authorization', function ($c) {
     $guzzle = $c->get('guzzle');
     return new \App\Authorization($connection, $config, $guzzle);
 });
+$container->set('channels', function ($c) {
+    $connection = $c->get('redis');
+    $guzzle = $c->get('guzzle');
+    $authorization = $c->get('authorization');
+    $config = $c->get('config');
+    return new \App\Channels($connection, $guzzle, $authorization, $config);
+});
+
 $container->set('loggerFactory', function ($c) {
     $settings =  [
         'name' => 'app',
@@ -75,9 +85,22 @@ $app->get('/', function (Request $request, Response $response) {
     return $response;
 })->setName('root');
 $app->get('/stream/{channel}', function (Request $request, Response $response, $args) {
-    $url = $this->get('scrapper')->fetchStreamUrl($args['channel']);
-    $response->withStatus(307);
-    return $response->withHeader('Location', $url);
+    try {
+        $url = $this->get('scrapper')->fetchStreamUrl($args['channel']);
+        $response->withStatus(307);
+        return $response->withHeader('Location', $url);
+    } catch (UnknownChannelNameException $ex) {
+        $response->withStatus(404);
+        $response->getBody()->write("Given channel id is not found.");
+        return $response;
+    }
+})->setName('root');
+$app->get('/channels', function (Request $request, Response $response, $args) {
+    $channels = $this->get('channels')->getChannels();
+    foreach ($channels as $id => $channel) {
+        $response->getBody()->write("Channel: id = " . $id . " name = " . $channel . "<br/>");
+    }
+    return $response;
 })->setName('root');
 
 // Run app
