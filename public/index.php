@@ -97,10 +97,8 @@ $app->get('/stream/{channel}', function (Request $request, Response $response, $
 })->setName('root');
 $app->get('/channels', function (Request $request, Response $response, $args) {
     $channels = $this->get('channels')->getChannels();
-    foreach ($channels as $id => $channel) {
-        $response->getBody()->write("Channel: id = " . $id . " name = " . $channel . "<br/>");
-    }
-    return $response;
+    $response->getBody()->write(json_encode($channels));
+    return $response->withHeader('Content-Type', 'application/json');
 })->setName('root');
 
 // Run app
