@@ -55,4 +55,13 @@ class Cache extends RedisAdapter {
         $this->save($item);
         return $item;
     }
+
+    /**
+     * Fetch all data from cache
+     * @return iterable|CacheItem[]
+     * @throws InvalidArgumentException
+     */
+    public function fetchAll() {
+        return $this->getItems();
+    }
 }

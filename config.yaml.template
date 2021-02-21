@@ -13,7 +13,17 @@ api:
 # access token expiration in seconds
 accessTokenExpiration: 1800
 
-# credentials to Magio.tv API
+# credentials to Magio.tv
 auth:
   username:
   password:
+
+# db connection
+db:
+    driver: pdo_pgsql
+    host: db
+    port: 5432
+    dbname: magio-streamer
+    user: root
+    password: root
+    charset: utf-8

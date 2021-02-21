@@ -7,6 +7,19 @@ services:
     - .:/var/www/html
     ports:
     - 1234:80
+    links:
+      - db
 
   redis:
     image: redis:latest
+
+  db:
+    image: postgres:13.1
+    ports:
+      - "45432:5432"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=magio-streamer
